@@ -1,0 +1,22 @@
+schema_version = "931743-config-v1"
+timeframe = "1d"
+strategy_version = "supermomentum-baseline-v1"
+annualization_factor = 244
+
+[strategy]
+score_near_tie_delta = "0.05"
+minimum_r_squared = "0.35"
+volatility_floor = "0.000001"
+entry_threshold = "1.25"
+exit_threshold = "0.25"
+fast_loss_delta = "0.75"
+entry_persistence = 2
+minimum_warmup_bars = 80
+atr_period = 14
+ewma_lambda = "0.98360655737704918032786885245901639344262295081967"
+ewma_version = "lagged-ewma-60-61-seed-r1sq-v1"
+
+[strategy.windows]
+kind = "baseline_v1"
+fast_window = 8
+slow_windows = [16, 32, 64]

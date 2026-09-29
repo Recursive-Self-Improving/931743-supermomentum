@@ -1,0 +1,37 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments and packaging
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Coverage and profiling
+.coverage
+.coverage.*
+htmlcov/
+.prof/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+
+# Generated report sites and audit artifacts
+reports/
+*.tmp

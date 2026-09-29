@@ -1,0 +1,101 @@
+name: Daily 931743 momentum signals
+
+on:
+  schedule:
+    # UTC 10:00 = Asia/Shanghai 18:00. The application skips exchange holidays.
+    - cron: '0 10 * * 1-5'
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/daily-index-report.yml'
+      - 'src/supermomentum/index_report/**'
+      - 'src/supermomentum/config.py'
+      - 'src/supermomentum/defaults.toml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Capture completed sessions and build all-history dashboard
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      publish: ${{ steps.report.outputs.publish }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Set up locked environment runner
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.12.20'
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install frozen runtime dependencies
+        run: uv sync --frozen --no-dev
+
+      - name: Fetch official history and update signals
+        id: report
+        env:
+          RUN_EVENT: ${{ github.event_name }}
+        shell: bash
+        run: |
+          args=()
+          if [[ "$RUN_EVENT" == "schedule" ]]; then
+            args+=(--scheduled)
+          fi
+          uv run --frozen --no-dev python -m supermomentum.index_report \
+            --output "$RUNNER_TEMP/index-report" "${args[@]}"
+
+      - name: Retain immutable data and report audit
+        if: steps.report.outputs.publish == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: index-report-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ steps.report.outputs.run_path }}
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload public site only
+        if: steps.report.outputs.publish == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ steps.report.outputs.site_path }}
+
+  deploy:
+    name: Deploy complete report to GitHub Pages
+    needs: build
+    if: needs.build.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

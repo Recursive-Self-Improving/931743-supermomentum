@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>{title} · 931743 信号观察</title>
+<style>{css}</style>
+</head>
+<body>
+<div class="shell">
+  <header class="masthead">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">∿</span><span>市场研究 / MARKET INTELLIGENCE</span></div>
+    <div class="mast-meta">931743 · 每日条件观察 · 离线档案</div>
+  </header>
+  <main>
+    <div class="intro">
+      <div><div class="eyebrow">中国证券指数 · 日频研究</div><h1 id="report-title">{title}</h1><p class="subtitle">超级动量 · 慢线 / 快线条件历史</p></div>
+      <div class="intro-aside"><span class="live-dot" aria-hidden="true"></span><span>完整历史 · 原始日线</span></div>
+    </div>
+    <div class="notice" role="note"><strong>研究用途，不是交易指令。</strong>图中的标记仅表示当日条件成立，不代表成交、收益或回测；快线与慢线共用买入条件。数据不足或活动区间未知时显示“未知”，绝不视为持有。</div>
+    <noscript><p class="notice">JavaScript 未启用，图表与筛选不可用。最新完整日线：{latest}；{status}。全部历史数据可通过页面底部的 CSV / JSON 下载。</p></noscript>
+    <section class="overview" aria-label="最新数据状态">
+      <div class="latest-card"><div class="card-kicker">最新已收录交易日 / LATEST SESSION</div><div class="latest-date" id="latest-date">{latest}</div><div id="latest-status" class="status-pill">{status}</div><div class="latest-foot" id="latest-foot">收盘条件，不是成交</div></div>
+      <div class="metric-card"><div class="card-kicker">历史覆盖 / COVERAGE</div><div class="metric-value" id="coverage-bars">{bars} 个交易日</div><div class="metric-note" id="coverage-dates">{first} — {latest}</div></div>
+      <div class="metric-card"><div class="card-kicker">当前视图 · 买入条件</div><div class="metric-value buy-text" id="buy-count">—</div><div class="metric-note">条件日，不是交易笔数</div></div>
+      <div class="metric-card"><div class="card-kicker">当前视图 · 卖出条件</div><div class="metric-value sell-text" id="sell-count">—</div><div class="metric-note">条件日，不是交易笔数</div></div>
+    </section>
+    <section class="workspace" aria-label="历史信号分析">
+      <div class="section-header"><div><div class="eyebrow">01 / SIGNAL EXPLORER</div><h2>历史行情与条件</h2><p>默认展示全部历史。选择蜡烛，查看该交易日的原始价格及两种条件。</p></div><div class="view-count" id="view-count" aria-live="polite">—</div></div>
+      <div class="controls">
+        <label>策略视角<select id="variant"><option value="slow">慢线 · Slow</option><option value="fast">快线 · Fast</option></select></label>
+        <label>时间范围<select id="range"><option value="all" selected>全部历史</option><option value="2y">近 2 年</option><option value="1y">近 1 年</option><option value="3m">近 3 个月</option></select></label>
+        <label>标记方式<select id="signal-mode"><option value="all" selected>所有条件日</option><option value="first">首次触发日</option></select></label>
+        <label>条件类型<select id="signal-side"><option value="all">买入 + 卖出</option><option value="buy">仅买入</option><option value="sell">仅卖出</option></select></label>
+      </div>
+      <div class="chart-key"><span><i class="swatch candle-up"></i>上涨日</span><span><i class="swatch candle-down"></i>下跌日</span><span><i class="swatch key-buy"></i>买入条件</span><span><i class="swatch key-sell"></i>卖出条件</span><span><i class="swatch key-m"></i>慢速动量 M</span><span><i class="swatch key-f"></i>快速动量 F</span></div>
+      <p class="chart-help">横向滚动查看全部历史；点击蜡烛，或聚焦图表后按 ← →、Home、End 选择日期。▲ 与 ▼ 可在同一天并列出现。</p>
+      <div class="chart-scroll" id="chart-scroll"><svg id="chart" tabindex="0" role="group" aria-label="历史日线蜡烛图；方向键选择交易日" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div class="chart-caption"><span id="chart-dates">—</span><span>价格 / 点位 · M 慢速动量 · F 快速动量</span></div>
+    </section>
+    <section class="detail-grid" aria-label="选中交易日和条件列表">
+      <div class="panel detail-panel"><div class="eyebrow">02 / SELECTED SESSION</div><h2>选中交易日 <span class="not-latest">≠ 最新收录日</span></h2><div id="selected-bar" aria-live="polite">—</div></div>
+      <div class="panel events-panel"><div class="eyebrow">03 / CONDITION LOG</div><h2>全部符合条件的日期</h2><p class="panel-note">下表完整列出当前筛选范围内的条件日。买、卖同日成立时分别列出，行数不是交易笔数。</p><div id="events-summary" class="events-summary" aria-live="polite">—</div><div class="table-scroll"><table id="signal-table"><thead><tr><th scope="col">交易日</th><th scope="col">条件</th><th scope="col">标记</th><th scope="col">收盘</th><th scope="col">M / F</th><th scope="col">原因</th></tr></thead><tbody></tbody></table></div></div>
+    </section>
+    <section class="provenance" aria-label="来源与方法">
+      <div class="eyebrow">04 / DATA & METHOD</div><h2>数据来源与判读口径</h2><div class="provenance-grid"><div><div class="prov-label">来源及时间</div><div id="source-info"></div></div><div><div class="prov-label">覆盖与配置</div><div id="method-info"></div></div></div>
+      <div class="reason-legend"><strong>条件说明</strong><span>买入：M &gt; {entry} 连续至少 {persistence} 日，且通过预热、拟合与斜率方向检查；两版买入条件相同。</span><span>卖出 M：M &lt; {exit_threshold}；F：F ≤ 0；D：F 比前日下降超过 {fast_delta}。快线卖出包含慢线卖出；仅在有效活动区间计算。</span><span>“首次”是全历史连续条件的起点，不因选择时间窗口而重置；从未知段恢复时另行标注，不声称新的阈值穿越。无有效活动区间或预热期内卖出条件为未知。</span></div>
+      <div id="warnings" class="warnings" hidden></div>
+    </section>
+    <section class="downloads" aria-label="下载数据"><div><div class="eyebrow">05 / EXPORT</div><h2>带走原始观察记录</h2><p>文件可离线打开；原始来源数据另存于审计工件，不包含在本站。</p></div><div class="download-links"><a href="daily.csv" download>日线数据 CSV ↗</a><a href="signals.csv" download>信号条件 CSV ↗</a><a href="summary.json" download>摘要 JSON ↗</a><a href="manifest.json" download>来源清单 JSON ↗</a></div></section>
+  </main>
+  <footer>931743 · SUPER MOMENTUM / DESCRIPTIVE RESEARCH <span>仅供研究 · 非投资建议 · 无真实执行</span></footer>
+</div>
+<script type="application/json" id="report-data">{data}</script>
+<script>{js}</script>
+</body>
+</html>
